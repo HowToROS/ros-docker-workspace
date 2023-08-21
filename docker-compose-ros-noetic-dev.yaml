@@ -1,0 +1,56 @@
+version: "3.7"
+
+x-env-file-common-variables: &env_file
+    config/ros1/${HOSTNAME}.env
+
+services:
+
+  rosmaster:
+    image: ros:noetic-ros-core
+    container_name: rosmaster
+    restart: unless-stopped
+    network_mode: host
+    ipc: host 
+    user: "${USERSETUP:-0:0}"
+    environment:
+      - "HOME=/root"
+      - "ROS_LOG_DIR=/root/.ros"
+    env_file: *env_file
+    command: stdbuf -o L roscore
+    # command: tail -f /dev/null
+    volumes:
+      - $HOME/logs:/root/.ros/
+
+  ros-dev:
+    container_name: ros1-dev
+    image: ros-dev:nvidia-noetic
+    network_mode: host
+    ipc: host 
+    build:
+      context: .
+      dockerfile: Dockerfile.nvidia-ros-noetic
+      network: host
+    depends_on:
+      - rosmaster
+    environment:
+      - "DISPLAY"
+      - "NVIDIA_VISIBLE_DEVICES=all"
+      - "NVIDIA_DRIVER_CAPABILITIES=all"
+    env_file: *env_file
+    privileged: true
+    restart: unless-stopped
+    # command: bash -c "sleep 3; source "
+    command: tail -f /dev/null
+    volumes:
+      - type: bind
+        source: /dev
+        target: /dev
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - $HOME/.Xauthority:/root/.Xauthority:rw
+      - /var/run/dbus:/var/run/dbus
+      - $HOME/.ssh:/root/.ssh
+      - $HOME/logs/docker/ros:/root/.ros/
+      - $HOME/ros1_ws:/root/ros1_ws
+      - $HOME/ros-docker-workspace:/root/ros-docker-workspace
+
+
