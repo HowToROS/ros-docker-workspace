@@ -2,6 +2,8 @@
 
 This repository provides a step-by-step guide to set up a ROS development environment within a Docker container on your local computer. Using Docker ensures a consistent and isolated environment for your ROS projects, and integrating it with Visual Studio Code (VSCode) enhances your development experience.
 
+This repository is for ROS Noetic. For ROS2 Docker development environment see this repository: [ros2-docker-workspace](https://github.com/niladut/ros2-docker-workspace)
+
 ## Prerequisites
 
 Before you begin, make sure you have the following prerequisites:
